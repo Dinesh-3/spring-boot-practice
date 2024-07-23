@@ -20,10 +20,14 @@ import static org.assertj.core.api.Assertions.*;
 public class AccountClientTests {
 
 	@Autowired
-	private TestRestTemplate restTemplate;
+	private final TestRestTemplate restTemplate;
 
 	private Random random = new Random();
-	
+
+	public AccountClientTests(TestRestTemplate restTemplate) {
+		this.restTemplate = restTemplate;
+	}
+
 	@Test 
 	public void listAccounts() {
 		String url = "/accounts";

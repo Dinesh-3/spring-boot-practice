@@ -8,6 +8,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.sql.DataSource;
@@ -46,28 +47,17 @@ public class RewardNetworkPropagationTests {
 	 */
 	private JdbcTemplate template;
 
-	/**
-	 * Manages transaction manually
-	 */
-	@Autowired
-	private PlatformTransactionManager transactionManager;
-
 	@Autowired
 	public void initJdbcTemplate(DataSource dataSource) {
 		this.template = new JdbcTemplate(dataSource);
 	}
 
 	@Test
+	@Transactional
 	public void testPropagation() {
-		// Open a transaction for testing
-		TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
-
 		// Run the test - generate a reward
 		Dining dining = Dining.createDining("100.00", "1234123412341234", "1234567890");
 		rewardNetwork.rewardAccountFor(dining);
-
-		// Rollback the transaction started by this test
-		transactionManager.rollback(status);
 
 		// Assert that a Reward has been saved to the database - for this to be true
 		// the RewardNetwork must run and commit its OWN transaction
